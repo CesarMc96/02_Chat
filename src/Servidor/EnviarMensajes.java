@@ -18,62 +18,34 @@ public class EnviarMensajes implements Runnable {
 	private String mensaje;
 	
 	public EnviarMensajes( Socket socket, Frame ventana ) {
-		
 		this.socket = socket;
 		pantalla = (PantallaServidor) ventana;
-		
-		pantalla.getTxtConversacion().addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-
-				mensaje = e.getActionCommand();
-				enviarDatos(mensaje, pantalla.getTxtNombre().getText() );
-				
-			}
-		});
-		
+		pantalla.getTxtConversacion().addActionListener((ActionEvent e) -> {
+                    mensaje = e.getActionCommand();
+                    enviarDatos(mensaje, pantalla.getTxtNombre().getText() );
+                });
 	}
 	
 	public void enviarDatos( String mensaje, String usuario ) {
-		
 		try {
-			
 			dos.writeUTF( usuario + " : " + mensaje );
 			dos.flush();
 			pantalla.mostraMensaje( usuario + " : " + mensaje );
-			
 		} catch (IOException e) {
-		
-			e.printStackTrace();
 		}
-		
 	}
 	
 	public void mostrarMensaje( String mensaje ) {
-		
 		pantalla.getMensajeArea().append(mensaje);
-		
 	}
 
 	@Override
 	public void run() {
-
 		try {
-			
 			dos = new DataOutputStream( socket.getOutputStream() );
 			dos.flush();
-			
 		} catch ( SocketException ex ) {
-			
-			ex.printStackTrace();
-			
 		} catch (IOException e) {
-			
-			e.printStackTrace();
-		
 		}
-	 
 	}
-	
-	
-
 }
