@@ -46,7 +46,7 @@ public class PantallaCliente extends JFrame {
     private JTextField txtConversacion;
     private JTextField txtMensajes;
     private static ServerSocket server;
-
+    private static Socket socket;
 
     public PantallaCliente() {
         super.setSize(450, 400);
@@ -179,6 +179,25 @@ public class PantallaCliente extends JFrame {
 
     public void setTxtNombre(JTextField txtNombre) {
         this.txtNombre = txtNombre;
+    }
+
+    public static void main(String[] args) {
+        PantallaCliente pantalla = new PantallaCliente();
+        ExecutorService correr = Executors.newCachedThreadPool();
+
+        JOptionPane.showMessageDialog(null, "Buscando Servidor . . . ", "", JOptionPane.INFORMATION_MESSAGE);
+
+        try {
+            socket = new Socket("localhost", 3000);
+            JOptionPane.showMessageDialog(null, "Conectado a : " + socket.getInetAddress().getHostName(),
+                    "", JOptionPane.INFORMATION_MESSAGE);
+            correr.execute(new RecibirMensaje(socket, pantalla));
+            correr.execute(new EnviarMensaje(socket, pantalla));
+        } catch (UnknownHostException e) {
+        } catch (IOException e) {
+        } finally {
+            correr.shutdown();
+        }
     }
 
 }

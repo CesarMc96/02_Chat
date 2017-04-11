@@ -43,12 +43,14 @@ public class PantallaServidor extends JFrame {
     private JPanel pnlTotal;
     private JPanel pnlOrden;
     JTextField txtConversacion;
+    private static ServerSocket server;
+    private static Socket socket;
 
     public PantallaServidor() {
         super.setSize(450, 400);
-        super.setTitle("Chat. Servidor!. \n ");
-        super.setLayout(new BorderLayout());
+        super.setTitle("Chat. Servidor!. ");
         super.setLocationRelativeTo(null);
+        super.setLayout(new BorderLayout());
         super.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         lblTitulo = new JLabel(" C H A T ");
@@ -163,4 +165,26 @@ public class PantallaServidor extends JFrame {
         this.txtConversacion = txtConversacion;
     }
 
+    public static void main(String[] args) {
+        PantallaServidor pantalla = new PantallaServidor();
+        ExecutorService correr = Executors.newCachedThreadPool();
+
+        try {
+            server = new ServerSocket(3000);
+            JOptionPane.showMessageDialog(null, "Esperando Cliente . . . \n ", "", JOptionPane.INFORMATION_MESSAGE);
+            while (true) {
+                try {
+                    socket = server.accept();
+                    JOptionPane.showMessageDialog(null, " Conectado a : " + socket.getInetAddress().getHostName(), "", JOptionPane.INFORMATION_MESSAGE);
+                    correr.execute(new RecibirMensajes(socket, pantalla));
+                    correr.execute(new EnviarMensajes(socket, pantalla));
+                } catch (IOException e) {
+                }
+            }
+        } catch (IOException e) {
+        } finally {
+            correr.shutdown();
+        }
+    }
+    
 }
